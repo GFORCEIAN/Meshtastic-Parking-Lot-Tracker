@@ -1,3 +1,13 @@
 /newNodeReference.json
 /All-Devices-ids.json
 /Heltec-V3-Device-ids.json
+/.idea/.gitignore
+/.idea/discord.xml
+/.idea/Meshtastic-Parking-Lot-Tracker.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vcs.xml
+/devices/All-Devices-ids.json
+/devices/Heltec-V3-Device-ids.json
+/devices/newNodeReference.json
