@@ -34,8 +34,9 @@ pub.subscribe(onReceive, 'meshtastic.receive')
 
 while(True):
     time.sleep(1)
-    print("> ")
+    print("> ", end= "")
     m = input()
+    print("\n")
     interface.sendText(text=m,channelIndex=2)
     print("sent message " + m)
 
