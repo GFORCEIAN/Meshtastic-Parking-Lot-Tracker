@@ -1,1 +1,0 @@
-This Directory is for Logging Nodes and server operation.
