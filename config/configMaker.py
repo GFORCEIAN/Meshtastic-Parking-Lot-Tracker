@@ -60,6 +60,7 @@ while True:
         case 4:
             print(json.dumps(config, indent=4))
         case 5:
+            print("see ya later alligator 🐊")
             exit(0)
 
 
