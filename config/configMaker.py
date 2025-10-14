@@ -1,4 +1,4 @@
-
+import json
 
 
 def getLotConfig() -> dict:
@@ -22,10 +22,16 @@ def getLotConfig() -> dict:
         lot = input()
         conf["lotConfig"].update({name: lot})
     return conf
-
+config : dict
 numCommands = 5
 while True:
     op : int = 0
+    try:
+        with open("config.json","r") as j:
+            config = json.load(j)
+            j.close()
+    except FileNotFoundError:
+        print("no previous config found. Creating fresh config.\n")
     print("What would you like to do?\n"
           "1: update devices\n"
           "2: update server configuration\n"
@@ -44,13 +50,15 @@ while True:
             print("please provide an integer")
     match op:
         case 1:
-            getLotConfig()
+            config.update(getLotConfig())
+            with open("config.json", "w") as w:
+                json.dump(config,w,indent=4)
         case 2:
             pass
         case 3:
             pass
         case 4:
-            pass
+            print(json.dumps(config, indent=4))
         case 5:
             exit(0)
 
