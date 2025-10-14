@@ -1,0 +1,1 @@
+This Folder is mainly for server operator diagnostics
