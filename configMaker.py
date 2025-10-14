@@ -1,5 +1,11 @@
 import json
 
+defaultConf = {"lotConfig" : {},
+               "serverConfig" : {},
+               "webServerConfig" : {}
+               }
+
+
 config : dict
 
 
@@ -68,7 +74,7 @@ while True:
             j.close()
     except FileNotFoundError:
         print("no previous config found. Creating fresh config.\n")
-        config = {"lotConfig" : {}, "serverConfig" : {}, "webServerConfig" : {}}
+        config = defaultConf
         updateConfigFile(config)
     print("What would you like to do?\n"
           "1: Update devices\n"
