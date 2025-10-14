@@ -51,7 +51,7 @@ def getWebServerConfig() -> dict:
 
 def updateConfigFile(newConf : dict) -> None:
     config.update(newConf)
-    with open("config.json", "w") as w:
+    with open("config/config.json", "w") as w:
         json.dump(config, w, indent=4)
 
 
@@ -63,7 +63,7 @@ numCommands = 5
 while True:
     op : int = 0
     try:
-        with open("config.json","r") as j:
+        with open("config/config.json", "r") as j:
             config = json.load(j)
             j.close()
     except FileNotFoundError:
