@@ -2,7 +2,7 @@ import time
 from datetime import datetime
 import meshtastic
 from Tools.scripts.texi2html import increment
-from meshtastic import ble_interface
+from meshtastic import ble_interface, serial_interface
 from pubsub import pub
 
 
@@ -29,7 +29,7 @@ connected = False
 while(not connected):
     try:
         #interface = meshtastic.ble_interface.BLEInterface('Meshtastic_01c8')
-        #interface = meshtastic.serial_interface.SerialInterface()
+        interface = meshtastic.serial_interface.SerialInterface()
 
         connected = True
     except meshtastic.ble_interface.BLEInterface.BLEError:
@@ -48,10 +48,7 @@ def onReceive(packet, interface):
 pub.subscribe(onReceive, 'meshtastic.receive')
 numCommands = 4
 while(True):
-    time.sleep(1)
-
     op: int = 0
-
     print("What would you like to do?\n"
           "1: Send HeartBeat ❤️\n"
           "2: Update Lot Count\n"
@@ -96,5 +93,5 @@ while(True):
             pass
     #
     if shouldSend == True:
-        #interface.sendText(text=m, channelIndex=2)
+        interface.sendText(text=m, channelIndex=2)
         print(f"sent text: {m}\n\n")
