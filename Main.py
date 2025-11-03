@@ -4,21 +4,20 @@ from pubsub import pub
 from csv_logger_test import ParkingLog
 
 interface : meshtastic.serial_interface.SerialInterface
+custom_lots = ["Lot North", "Lot East", "Lot West"]
+custom_status = {
+    "Lot North": (20, 100),  # 20 cars currently, 100 max
+    "Lot East": (55, 60),  # 55/60
+    "Lot West": (0, 40)  # 0/40
+}
+# Create your parking logger with custom setup
+logger = ParkingLog(filename="parking_log.csv", lots=custom_lots, initial_counts=custom_status)
 
 def main():
     global interface
     interface = meshtastic.serial_interface.SerialInterface("/dev/ttyS0")
 
     pub.subscribe(onReceive, 'meshtastic.receive')
-
-    custom_lots = ["Lot North", "Lot East", "Lot West"]
-    custom_status = {
-        "Lot North": (20, 100),  # 20 cars currently, 100 max
-        "Lot East": (55, 60),  # 55/60
-        "Lot West": (0, 40)  # 0/40
-    }
-    # Create your parking logger with custom setup
-    logger = ParkingLog(filename="parking_log.csv", lots=custom_lots, initial_counts=custom_status)
 
     # main loop
     while True:
@@ -29,7 +28,6 @@ def main():
             print("Serial closed")
             break
         send_message(text)
-
 
 
 
@@ -76,9 +74,6 @@ def onReceive(packet:dict, interface):
 
 def send_message(message:str):
     interface.sendText(message, channelIndex=2, destinationId="!433b01c8", wantResponse=True)
-
-
-
 
 
 
