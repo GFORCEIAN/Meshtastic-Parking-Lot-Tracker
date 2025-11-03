@@ -1,7 +1,7 @@
 import time
 from datetime import datetime
 import meshtastic
-from Tools.scripts.texi2html import increment
+# from Tools.scripts.texi2html import increment
 from meshtastic import ble_interface, serial_interface
 from pubsub import pub
 
