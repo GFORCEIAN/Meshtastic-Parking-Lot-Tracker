@@ -1,6 +1,6 @@
 import json
 import meshtastic
-from meshtastic import ble_interface
+from meshtastic import ble_interface, serial_interface
 
 
 getAllDevices = True
@@ -14,7 +14,8 @@ print("Not connected...")
 while not connected:
     try:
         print(" trying to connect...")
-        iface = meshtastic.ble_interface.BLEInterface('Meshtastic_01c8')
+        #iface = meshtastic.ble_interface.BLEInterface('Meshtastic_01c8')
+        iface = meshtastic.serial_interface.SerialInterface('')
         connected = True
     except meshtastic.ble_interface.BLEInterface.BLEError:
         pass
