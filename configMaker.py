@@ -1,4 +1,5 @@
 import json
+from jsonParser import readJsonFile
 
 defaultConf = {"lotConfig" : {},
                "serverConfig" : {},
@@ -41,9 +42,23 @@ def getLotConfig() -> dict:
     for i in range(1, num + 1):
         print("whats the short name of node " + str(i) + ": ", end="")
         name = input()
+
+        decision : str = input("Would you like to use a cached value for the ID?  Y/n: ").lower()
+
+        if decision != "" and decision != "y":
+            print("whats the ID of the node " + str(i) + ": ", end="")
+            id = input()
+        else:
+            idJson : dict = readJsonFile("devices/Heltec-V3-Device-ids.json")
+            id: str = idJson.get(name,None)
+            if (id != None):
+                print("using cached value " +id)
+            else:
+                print("id not found, writing: \"\"")
         print("whats the lot name " + name + " monitors?")
         lot = input()
-        conf["lotConfig"].update({name: lot})
+
+        conf["lotConfig"].update({lot: (name, id)})
     return conf
 
 
