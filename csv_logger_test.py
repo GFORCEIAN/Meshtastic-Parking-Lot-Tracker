@@ -10,7 +10,7 @@ class ParkingLog:
         self.initial_counts = initial_counts
         self.initialize_csv()
 
-    # === Utility ===
+    # === Helper for Initialize ===
     def format_count(self, cur, max_cars):
         """Format count safely so Excel doesn't treat it like a date."""
         return f"{cur}_of_{max_cars}"
@@ -112,7 +112,7 @@ class ParkingLog:
     def get_lot_status(self, lot_name=None):
         """Return current car counts for one lot or all lots."""
         if not os.path.exists(self.filename):
-            print("CSV not found! Initializing...")
+            print("CSV not found!!!! Initializing...")
             self.initialize_csv()
 
         with open(self.filename, "r") as file:
@@ -142,12 +142,16 @@ class ParkingLog:
             print(f"{lot}: {info['current']}/{info['max']} ({info['available']} left)")
         return status
 
-custom_lots = ["North Lot", "East Lot", "Overflow"]
+custom_lots = ["Lot North", "Lot East", "Lot West"]
 custom_status = {
-    "North Lot": (20, 100),  # 20 cars currently, 100 max
-    "East Lot": (55, 60),  # 55/60
-    "Overflow": (0, 40)  # 0/40
+    "Lot North": (20, 100),  # 20 cars currently, 100 max
+    "Lot East": (55, 60),  # 55/60
+    "Lot West": (0, 40)  # 0/40
 }
 # Create your parking logger with custom setup
 logger = ParkingLog(filename="parking_log.csv", lots=custom_lots, initial_counts=custom_status)
-logger.update_lot("North Lot","enter")
+logger.update_lot("Lot North","enter")
+logger.update_lot("Lot North","leave")
+logger.get_lot_status()
+logger.update_lot("Lot East","leave")
+logger.update_lot("Lot West","leave")
