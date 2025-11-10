@@ -8,7 +8,7 @@ interface : meshtastic.serial_interface.SerialInterface
 
 
 config: dict = readJsonFile("config/config.json")
-nodeConfig : dict = config.get("d")
+nodeConfig : dict[str,str] = config.get("d")
 
 
 
@@ -23,7 +23,11 @@ custom_status = {
 logger = ParkingLog(filename="parking_log.csv", lots=custom_lots, initial_counts=custom_status)
 def main():
     global interface
-    interface = meshtastic.serial_interface.SerialInterface("/dev/ttyUSB0")
+    # switch depending on if ian's computer or pi
+    # interface = meshtastic.serial_interface.SerialInterface("/dev/ttyUSB0")
+    interface = meshtastic.serial_interface.SerialInterface("/dev/ttyS0")
+
+    pub.subscribe(onReceive, 'meshtastic.receive')
 
     # main loop
     while True:
@@ -56,12 +60,19 @@ def interpret(s: str, fromId):
             print("got bat info")
             pass # do nothing for now
 
-        case "E": #log error condition
+        case "W": #log warning condition
+            if len(msg) != 3:
+                print("Invalid warning format")
+            warningMessage:str = msg[1]
+            id:int = int(msg[2])
+
+            print(f"Warning ({id}): {warningMessage}")
+            send_message(f"WR,{id}")
             pass # do nothing for now
 
         case "❤️":
-            # heart beat
-
+            # heart beat, relpy with beating heart
+            send_message("💓")
             pass
         case _:
             pass
@@ -82,8 +93,6 @@ def onReceive(packet:dict, interface):
 
 def send_message(message:str):
     interface.sendText(message, channelIndex=2, destinationId="!433b01c8", wantResponse=True)
-
-
 
 
 
