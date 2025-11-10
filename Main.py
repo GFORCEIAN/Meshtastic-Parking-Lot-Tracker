@@ -1,10 +1,19 @@
 import meshtastic.serial_interface
 from pubsub import pub
+from jsonParser import readJsonFile
 
 from csv_logger_test import ParkingLog
 
 interface : meshtastic.serial_interface.SerialInterface
-custom_lots = ["Lot North", "Lot East", "Lot West"]
+
+
+config: dict = readJsonFile("config/config.json")
+nodeConfig : dict = config.get("d")
+
+
+
+custom_lots = config.get("lotConfig")
+print(custom_lots)
 custom_status = {
     "Lot North": (20, 100),  # 20 cars currently, 100 max
     "Lot East": (55, 60),  # 55/60
@@ -12,12 +21,9 @@ custom_status = {
 }
 # Create your parking logger with custom setup
 logger = ParkingLog(filename="parking_log.csv", lots=custom_lots, initial_counts=custom_status)
-
 def main():
     global interface
-    interface = meshtastic.serial_interface.SerialInterface("/dev/ttyS0")
-
-    pub.subscribe(onReceive, 'meshtastic.receive')
+    interface = meshtastic.serial_interface.SerialInterface("/dev/ttyUSB0")
 
     # main loop
     while True:
@@ -27,7 +33,7 @@ def main():
             interface.close()
             print("Serial closed")
             break
-        send_message(text)
+    send_message(text)
 
 
 
@@ -55,7 +61,7 @@ def interpret(s: str, fromId):
 
         case "❤️":
             # heart beat
-        
+
             pass
         case _:
             pass
@@ -67,6 +73,8 @@ def onReceive(packet:dict, interface):
             message_bytes = packet['decoded']['payload']
             from_bytes = packet['fromId']
             message_string = message_bytes.decode('utf-8')
+            # print(message_string)
+            # print(from_bytes)
 
             interpret(message_string, from_bytes)
     except KeyError as e:
@@ -74,6 +82,11 @@ def onReceive(packet:dict, interface):
 
 def send_message(message:str):
     interface.sendText(message, channelIndex=2, destinationId="!433b01c8", wantResponse=True)
+
+
+
+
+
 
 
 
