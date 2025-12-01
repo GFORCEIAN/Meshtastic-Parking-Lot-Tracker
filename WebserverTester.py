@@ -1,20 +1,15 @@
-import os
-import random
-
+# WebserverTester.py
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
-import random
-
-import uvicorn
 from datetime import datetime
+
+logger = None   # will be set by Main.py
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins (your React dev server)
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,26 +17,42 @@ app.add_middleware(
 
 program_start_time = datetime.now()
 
-def get_program_uptime(start_time: datetime):
+def set_logger(parking_logger):
+
+    #Called by Main.py to give this module its logger.
+    global logger
+    logger = parking_logger
+
+
+def get_program_uptime(start_time):
     current_time = datetime.now()
     uptime = current_time - start_time
-    return f"{uptime.days}:{int((uptime.seconds/3600)%24)}:{int((uptime.seconds/60)%60)}:{uptime.seconds%60}"
+    return f"{uptime.days}:{(uptime.seconds//3600)%24}:{(uptime.seconds//60)%60}:{uptime.seconds%60}"
 
 
 @app.get("/uptime")
 def uptime():
-    return f"This is the Meshtastic Parking Lot Tracking Server For ELEE351. Server Uptime: {get_program_uptime(program_start_time)}"
-
+    return f"Meshtastic Parking Server Uptime: {get_program_uptime(program_start_time)}"
 
 
 @app.get("/api")
 def api():
+    if logger is None:
+        return {"error": "Logger not initialized"}
+
+    status = logger.get_lot_status()
+
     return {
-  "ParkingLotA": { "Free":random.randint(0,100), "Occupied": random.randint(0,100) },
-  "ParkingLotB": { "Free": random.randint(0,100), "Occupied": random.randint(0,100)},
-  "ParkingLotC": { "Free": random.randint(0,100), "Occupied": random.randint(0,100) }
-}
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8050) # Change 8050 to your desired portdolph
+        "ParkingLotA": {
+            "Free": status["Lot North"]["available"],
+            "Occupied": status["Lot North"]["current"]
+        },
+        "ParkingLotB": {
+            "Free": status["Lot East"]["available"],
+            "Occupied": status["Lot East"]["current"]
+        },
+        "ParkingLotC": {
+            "Free": status["Lot West"]["available"],
+            "Occupied": status["Lot West"]["current"]
+        },
+    }

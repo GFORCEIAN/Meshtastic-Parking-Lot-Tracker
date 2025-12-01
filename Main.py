@@ -1,43 +1,60 @@
 import meshtastic.serial_interface
 from pubsub import pub
 from jsonParser import readJsonFile
-
+import WebserverTester
 from csv_logger_test import ParkingLog
+import threading
 
 interface : meshtastic.serial_interface.SerialInterface
+nodeConnected:bool = False
 
+def start_webserver():
+    import uvicorn
+    uvicorn.run(WebserverTester.app, host="0.0.0.0", port=8050)
 
 config: dict = readJsonFile("config/config.json")
-nodeConfig : dict[str,str] = config.get("d")
+nodeConfig : dict[str,str] = config.get("d") # This makes no sense ????
 
 
+custom_lots_dict = config.get("lotConfig")
+print(custom_lots_dict)
 
-custom_lots = config.get("lotConfig")
-print(custom_lots)
+custom_lots = list(custom_lots_dict.keys())
+
 custom_status = {
     "Lot North": (20, 100),  # 20 cars currently, 100 max
     "Lot East": (55, 60),  # 55/60
     "Lot West": (0, 40)  # 0/40
 }
-# Create your parking logger with custom setup
+
 logger = ParkingLog(filename="parking_log.csv", lots=custom_lots, initial_counts=custom_status)
+from WebserverTester import set_logger
+set_logger(logger)
+
+
+# Create your parking logger with custom setup
 def main():
     global interface
+    web_thread = threading.Thread(target=start_webserver, daemon=True)
+    web_thread.start()
+    print("Web server started on port 8050")
+
     # switch depending on if ian's computer or pi
     # interface = meshtastic.serial_interface.SerialInterface("/dev/ttyUSB0")
-    interface = meshtastic.serial_interface.SerialInterface("/dev/ttyS0")
 
-    pub.subscribe(onReceive, 'meshtastic.receive')
+    if nodeConnected:
+        interface = meshtastic.serial_interface.SerialInterface("/dev/ttyS0")
+        pub.subscribe(onReceive, 'meshtastic.receive')
 
     # main loop
-    while True:
-        text = input("> ")
-        if (text == "exit"):
-            # any cleanup code can goes here or after the while loop
-            interface.close()
-            print("Serial closed")
-            break
-    send_message(text)
+        while True:
+            text = input("> ")
+            if (text == "exit"):
+                # any cleanup code can goes here or after the while loop
+                interface.close()
+                print("Serial closed")
+                break
+            send_message(text)
 
 
 

@@ -12,12 +12,12 @@ class ParkingLog:
 
     # === Helper for Initialize ===
     def format_count(self, cur, max_cars):
-        """Format count safely so Excel doesn't treat it like a date."""
+        #Format count safely so Excel doesn't treat it like a date.
         return f"{cur}_of_{max_cars}"
 
     # === CSV Initialization ===
     def initialize_csv(self):
-        """Create the CSV with lot columns and initial counts if not exists."""
+        #Create the CSV with lot columns and initial counts if not exists.
         if not os.path.exists(self.filename):
             print("Creating CSV...")
             header, counts_row, subheader = [], [], []
@@ -62,14 +62,15 @@ class ParkingLog:
 
         # Check if full before allowing entry
         if action.lower() == "enter":
-            if cur >= max_cars:
+            cur += 1
+            EorD = "E"
+            '''
+            if cur > max_cars:
                 self._log_full(lot_name, rows, col_index, cur, max_cars)
                 self._save(rows)
                 self.handle_full_lot(lot_name)
                 return
-            else:
-                cur += 1
-                EorD = "E"
+            '''
         elif action.lower() == "leave":
             cur = max(cur - 1, 0)
             EorD = "D"
@@ -93,8 +94,8 @@ class ParkingLog:
 
     def _log_full(self, lot_name, rows, col_index, cur, max_cars):
         next_row = self._find_next_row(rows, col_index)
-        rows[next_row][col_index] = "FULL"
-        rows[next_row][col_index + 1] = ""
+        rows[next_row][col_index] = "E"
+        rows[next_row][col_index + 1] = "FULL"
         rows[next_row][col_index + 2] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"{lot_name} is FULL — logged and handled.")
 
@@ -149,9 +150,13 @@ custom_status = {
     "Lot West": (0, 40)  # 0/40
 }
 # Create your parking logger with custom setup
+
 logger = ParkingLog(filename="parking_log.csv", lots=custom_lots, initial_counts=custom_status)
-logger.update_lot("Lot North","enter")
+
 logger.update_lot("Lot North","leave")
+logger.update_lot("Lot North","enter")
+'''
 logger.get_lot_status()
-logger.update_lot("Lot East","leave")
+'''
+logger.update_lot("Lot East","enter")
 logger.update_lot("Lot West","leave")
