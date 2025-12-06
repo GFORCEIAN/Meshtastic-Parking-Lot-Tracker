@@ -6,7 +6,7 @@ from csv_logger_test import ParkingLog
 import threading
 
 interface : meshtastic.serial_interface.SerialInterface
-nodeConnected:bool = False
+nodeConnected:bool = True
 
 def start_webserver():
     import uvicorn
@@ -111,9 +111,11 @@ def onReceive(packet:dict, interface):
 def send_message(message:str):
     interface.sendText(message, channelIndex=2, destinationId="!433b01c8", wantResponse=True)
 
-
-
-
+def setLotCount(lotname:str, count: int):
+    config.get(lotname)[2] = count
+def getLotCount(lotname:str) -> int:
+    lotList = config.get(lotname)
+    return lotList[3] - lotList[2]
 
 
 main()
