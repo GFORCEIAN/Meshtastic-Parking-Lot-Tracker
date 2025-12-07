@@ -65,7 +65,7 @@ def main():
         while True:
             print("> ",end="")
             text:str = input()
-            print()
+            print(text)
             if text == "exit":
                 # any cleanup code can goes here or after the while loop
                 interface.close()
@@ -78,12 +78,13 @@ def main():
                         print("What woould you like to send? ")
                         send_message(input())
                     case "u":
-                        try:
 
+                        try:
+                            print("Which lot would you like to update?")
                             l:str = input()
                             print("how many cars?")
                             nc:str = input()
-                            setLotCount(l,int(nC))
+                            setLotCount(l,int(nc))
                             updateWebSite()
                         except Exception as w:
                             print(w)
