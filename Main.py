@@ -16,15 +16,13 @@ nodeConnected:bool = True
 
 def start_webserver():
     import uvicorn
-    uvicorn.run(WebserverTester.app, host="0.0.0.0", port=8050)
-    time.sleep(.5)
-    updateWebSite()
+    uvicorn.run(WebserverTester.app,log_level="warning", host="0.0.0.0", port=8050)
 
 config: dict = readJsonFile("config/config.json")
 
 
 custom_lots_dict = config.get("lotConfig")
-print(custom_lots_dict)
+#print(custom_lots_dict)
 
 custom_lots = list(custom_lots_dict.keys())
 
@@ -56,11 +54,14 @@ def main():
         else:
             interface = meshtastic.serial_interface.SerialInterface("/dev/ttyS0")
         pub.subscribe(onReceive, 'meshtastic.receive')
+
         print("""Commands:\n
         exit -> exit program\n
         s<text> -> send message\n
         u<lot_string,count_int> -> update lot count e.g  u(enter) Lot North (enter) 10 (enter) """)
-    # main loop
+
+        updateWebSite()
+        # main loop
         while True:
             text:str = input("> ")
             if text == "exit":
@@ -153,12 +154,13 @@ def updateWebSite():
         lotList = custom_lots_dict.get(lot)
         counts:tuple[int,int,str] = (lotList[1],lotList[2],lot)
         webLots.append(counts)
-    print(webLots)
+    #print(webLots)
     WebserverTester.setLots(webLots)
+
 
 try:
     main()
 finally:
     with open("config/config.json", "w") as w:
-        print(config)
+        #print(config)
         json.dump(config, w, indent=4)
