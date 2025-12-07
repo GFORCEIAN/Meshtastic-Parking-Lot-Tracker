@@ -63,7 +63,9 @@ def main():
         updateWebSite()
         # main loop
         while True:
-            text:str = input("> ")
+            print("> ",end="")
+            text:str = input()
+            print()
             if text == "exit":
                 # any cleanup code can goes here or after the while loop
                 interface.close()
@@ -73,10 +75,15 @@ def main():
                 c = text[0]#get command type
                 match c:
                     case "s":
-                        send_message(input("What woould you like to send? "))
+                        print("What woould you like to send? ")
+                        send_message(input())
                     case "u":
                         try:
-                            setLotCount(input("Which lot? "),int(input("How many cars? ")))
+
+                            l:str = input()
+                            print("how many cars?")
+                            nc:str = input()
+                            setLotCount(l,int(nC))
                             updateWebSite()
                         except Exception as w:
                             print(w)
