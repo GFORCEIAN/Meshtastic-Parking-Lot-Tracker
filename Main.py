@@ -182,7 +182,7 @@ def updateWebSite():
     webLots:list = []
     for lot in custom_lots:
         lotList = custom_lots_dict.get(lot)
-        counts:tuple[int,int,str] = (lotList[2] - lotList[1],lotList[1],lot)
+        counts:tuple[int,int,str] = (lotList[1],lotList[2] - lotList[1],lot)
         webLots.append(counts)
     #print(webLots)
     WebserverTester.setLots(webLots)
