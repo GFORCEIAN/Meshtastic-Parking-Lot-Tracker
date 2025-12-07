@@ -96,7 +96,7 @@ def interpret(s: str, fromId):
             if len(msg) < 3:
                 print("Invalid lot message format >:O. Expected: L,<lot_name>,<enter/leave>")
                 return
-                lot_name, inverted = getLotName(fromId)
+            lot_name, inverted = getLotName(fromId)
             if custom_lots.__contains__(lot_name):
 
                 entered:bool  = False
