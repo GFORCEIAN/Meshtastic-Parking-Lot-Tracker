@@ -80,10 +80,12 @@ def main():
                     case "u":
 
                         try:
-                            print("Which lot would you like to update?")
+                            print("Which lot would you like to update? ")
                             l:str = input()
-                            print("how many cars?")
+                            print(l)
+                            print("how many cars? ")
                             nc:str = input()
+                            print(nc)
                             setLotCount(l,int(nc))
                             updateWebSite()
                         except Exception as w:
