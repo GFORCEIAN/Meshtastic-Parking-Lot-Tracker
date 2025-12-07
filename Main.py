@@ -21,7 +21,7 @@ def start_webserver():
 config: dict = readJsonFile("config/config.json")
 
 
-custom_lots_dict = config.get("lotConfig")
+custom_lots_dict:dict = config.get("lotConfig")
 #print(custom_lots_dict)
 
 custom_lots = list(custom_lots_dict.keys())
@@ -35,7 +35,7 @@ custom_status = {
 logger = ParkingLog(filename="parking_log.csv", lots=custom_lots, initial_counts=custom_status)
 from WebserverTester import set_logger
 set_logger(logger)
-
+nodeToLot:dict = {}
 
 # Create your parking logger with custom setup
 def main():
@@ -96,12 +96,29 @@ def interpret(s: str, fromId):
             if len(msg) < 3:
                 print("Invalid lot message format >:O. Expected: L,<lot_name>,<enter/leave>")
                 return
-            lot_name = msg[1].strip()
-            action = msg[2].strip().lower()
+            if(custom_lots.__contains__(fromId)):
+                lot_name, inverted = getLotName(fromId)
+                lot_name = msg[1].strip()
 
-            print(f"Lot update received: {lot_name} -> {action}")
-            logger.update_lot(lot_name, action)
-            logger.get_lot_status()
+                entered:bool  = False
+
+                if(msg[2].strip().lower() == "R"):#right is entered on non inverted
+                    entered = True
+
+                if(inverted):
+                    entered = not entered #and vice versa
+
+                action:str = "enter" if entered else "leave"
+
+                print(f"Lot update received: {lot_name} -> {action}")
+                logger.update_lot(lot_name, action)
+                logger.get_lot_status()
+                if entered:
+                    enterLot(lot_name)
+                else:
+                    leaveLot(lot_name)
+                updateWebSite()
+
 
 
         case "B": #update Battery Monitoring CSV
@@ -148,6 +165,10 @@ def setLotCount(lotname:str, count: int):
 def getLotCount(lotname:str) -> int:
     lotList = config.get(lotname)
     return lotList[2] - lotList[1]
+def enterLot(lot:str):
+    setLotCount(lot,getLotCount(lot)+1)
+def leaveLot(lot:str):
+    setLotCount(lot, getLotCount(lot) - 1)
 def updateWebSite():
     webLots:list = []
     for lot in custom_lots:
@@ -156,6 +177,20 @@ def updateWebSite():
         webLots.append(counts)
     #print(webLots)
     WebserverTester.setLots(webLots)
+
+
+
+def getLotName(id:str)-> tuple[str,bool]:
+    if nodeToLot == {}:
+        for lot in custom_lots:
+            for node in custom_lots_dict.get(lot)[0]:
+                nodeToLot[node[0]]=(lot, node[1])
+    print(nodeToLot.get(id) + nodeToLot.get(id)[1])
+    return nodeToLot.get(id)[0],nodeToLot.get(id)[1]
+
+
+#getLotName("!433b01c8")
+
 
 
 try:
