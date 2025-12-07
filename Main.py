@@ -184,7 +184,7 @@ def getLotName(id:str)-> tuple[str,bool]:
         for lot in custom_lots:
             for node in custom_lots_dict.get(lot)[0]:
                 nodeToLot[node[0]]=(lot, node[1])
-    print(nodeToLot.get(id) + nodeToLot.get(id)[1])
+    #print(nodeToLot.get(id) + str(nodeToLot.get(id)[1]))
     return nodeToLot.get(id)[0],nodeToLot.get(id)[1]
 
 
