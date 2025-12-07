@@ -1,4 +1,6 @@
+import json
 import os
+import time
 
 import meshtastic.serial_interface
 from pubsub import pub
@@ -15,9 +17,10 @@ nodeConnected:bool = True
 def start_webserver():
     import uvicorn
     uvicorn.run(WebserverTester.app, host="0.0.0.0", port=8050)
+    time.sleep(.5)
+    updateWebSite()
 
 config: dict = readJsonFile("config/config.json")
-nodeConfig : dict[str,str] = config.get("d") # This makes no sense ????
 
 
 custom_lots_dict = config.get("lotConfig")
@@ -65,18 +68,19 @@ def main():
                 interface.close()
                 print("Serial closed")
                 break
-            c = text[0]#get command type
-            match c:
-                case "s":
-                    send_message(text)
-                case "u":
-                    try:
-                        setLotCount(input("Which lot? "),int(input("How many cars? ")))
-                        updateWebSite()
-                    except Exception as w:
-                        print(w)
-                case _:
-                    print("bad input")
+            if len(text) > 0:
+                c = text[0]#get command type
+                match c:
+                    case "s":
+                        send_message(input("What woould you like to send? "))
+                    case "u":
+                        try:
+                            setLotCount(input("Which lot? "),int(input("How many cars? ")))
+                            updateWebSite()
+                        except Exception as w:
+                            print(w)
+                    case _:
+                        print("bad input")
 
                 
 
@@ -97,6 +101,7 @@ def interpret(s: str, fromId):
             print(f"Lot update received: {lot_name} -> {action}")
             logger.update_lot(lot_name, action)
             logger.get_lot_status()
+
 
         case "B": #update Battery Monitoring CSV
             print("got bat info")
@@ -137,19 +142,23 @@ def send_message(message:str):
     interface.sendText(message, channelIndex=2, destinationId="!433b01c8", wantResponse=True)
 
 def setLotCount(lotname:str, count: int):
-    custom_lots_dict.get(lotname)[2] = count
+    custom_lots_dict.get(lotname)[1] = count
     print("Set " + lotname + " to " + str(count) + " cars.")
 def getLotCount(lotname:str) -> int:
     lotList = config.get(lotname)
-    return lotList[3] - lotList[2]
+    return lotList[2] - lotList[1]
 def updateWebSite():
     webLots:list = []
     for lot in custom_lots:
         lotList = custom_lots_dict.get(lot)
-        counts:tuple[int,int,str] = (lotList[2],lotList[3],lot)
+        counts:tuple[int,int,str] = (lotList[1],lotList[2],lot)
         webLots.append(counts)
     print(webLots)
     WebserverTester.setLots(webLots)
 
-
-main()
+try:
+    main()
+finally:
+    with open("config/config.json", "w") as w:
+        print(config)
+        json.dump(config, w, indent=4)

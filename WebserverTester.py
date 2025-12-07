@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 
+from starlette.responses import RedirectResponse
+
 logger = None   # will be set by Main.py
 
 app = FastAPI()
@@ -36,6 +38,9 @@ def get_program_uptime(start_time):
     uptime = current_time - start_time
     return f"{uptime.days}:{(uptime.seconds//3600)%24}:{(uptime.seconds//60)%60}:{uptime.seconds%60}"
 
+@app.get("/")
+def Redirect():
+    return RedirectResponse(url="/api")
 
 @app.get("/uptime")
 def uptime():
