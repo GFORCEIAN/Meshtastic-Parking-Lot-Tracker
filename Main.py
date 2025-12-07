@@ -1,9 +1,13 @@
+import os
+
 import meshtastic.serial_interface
 from pubsub import pub
 from jsonParser import readJsonFile
 import WebserverTester
 from csv_logger_test import ParkingLog
 import threading
+import platform
+
 
 interface : meshtastic.serial_interface.SerialInterface
 nodeConnected:bool = True
@@ -43,11 +47,11 @@ def main():
     # interface = meshtastic.serial_interface.SerialInterface("/dev/ttyUSB0")
 
     if nodeConnected:
-        server = True
-        if server:
-            interface = meshtastic.serial_interface.SerialInterface("/dev/ttyS0")
-        else:
+        HostName = platform.uname()[1]
+        if HostName == "IUseArchByTheWay":
             interface = meshtastic.serial_interface.SerialInterface("/dev/ttyUSB0")
+        else:
+            interface = meshtastic.serial_interface.SerialInterface("/dev/ttyS0")
         pub.subscribe(onReceive, 'meshtastic.receive')
         print("""Commands:\n
         exit -> exit program\n
