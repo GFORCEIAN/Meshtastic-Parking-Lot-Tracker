@@ -17,11 +17,18 @@ app.add_middleware(
 
 program_start_time = datetime.now()
 
+
+lotCounts:list = [(-1,-1,"Null"),(-1,-1,"Null"),(-1,-1,"Null")]
+
 def set_logger(parking_logger):
 
     #Called by Main.py to give this module its logger.
     global logger
     logger = parking_logger
+
+def setLots(lots:list):
+    global lotCounts
+    lotCounts= lots
 
 
 def get_program_uptime(start_time):
@@ -37,22 +44,20 @@ def uptime():
 
 @app.get("/api")
 def api():
-    if logger is None:
-        return {"error": "Logger not initialized"}
-
-    status = logger.get_lot_status()
-
+    #if logger is None:
+        #return {"error": "Logger not initialized"}
+    #status = logger.get_lot_status()
     return {
         "ParkingLotA": {
-            "Free": status["Lot North"]["available"],
-            "Occupied": status["Lot North"]["current"]
+            "Free": lotCounts[0][0],
+            "Occupied": lotCounts[0][1]
         },
         "ParkingLotB": {
-            "Free": status["Lot East"]["available"],
-            "Occupied": status["Lot East"]["current"]
+            "Free": lotCounts[1][0],
+            "Occupied": lotCounts[1][1]
         },
         "ParkingLotC": {
-            "Free": status["Lot West"]["available"],
-            "Occupied": status["Lot West"]["current"]
+            "Free": lotCounts[2][0],
+            "Occupied": lotCounts[2][1]
         },
     }

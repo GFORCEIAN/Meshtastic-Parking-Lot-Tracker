@@ -43,18 +43,39 @@ def main():
     # interface = meshtastic.serial_interface.SerialInterface("/dev/ttyUSB0")
 
     if nodeConnected:
-        interface = meshtastic.serial_interface.SerialInterface("/dev/ttyS0")
+        server = True
+        if server:
+            interface = meshtastic.serial_interface.SerialInterface("/dev/ttyS0")
+        else:
+            interface = meshtastic.serial_interface.SerialInterface("/dev/ttyUSB0")
         pub.subscribe(onReceive, 'meshtastic.receive')
-
+        print("""Commands:\n
+        exit -> exit program\n
+        s<text> -> send message\n
+        u<lot_string,count_int> -> update lot count e.g  u(enter) Lot North (enter) 10 (enter) """)
     # main loop
         while True:
-            text = input("> ")
-            if (text == "exit"):
+            text:str = input("> ")
+            if text == "exit":
                 # any cleanup code can goes here or after the while loop
                 interface.close()
                 print("Serial closed")
                 break
-            send_message(text)
+            c = text[0]#get command type
+            match c:
+                case "s":
+                    send_message(text)
+                case "u":
+                    try:
+                        setLotCount(input("Which lot? "),int(input("How many cars? ")))
+                        updateWebSite()
+                    except Exception as w:
+                        print(w)
+                case _:
+                    print("bad input")
+
+                
+
 
 
 
@@ -112,10 +133,19 @@ def send_message(message:str):
     interface.sendText(message, channelIndex=2, destinationId="!433b01c8", wantResponse=True)
 
 def setLotCount(lotname:str, count: int):
-    config.get(lotname)[2] = count
+    custom_lots_dict.get(lotname)[2] = count
+    print("Set " + lotname + " to " + str(count) + " cars.")
 def getLotCount(lotname:str) -> int:
     lotList = config.get(lotname)
     return lotList[3] - lotList[2]
+def updateWebSite():
+    webLots:list = []
+    for lot in custom_lots:
+        lotList = custom_lots_dict.get(lot)
+        counts:tuple[int,int,str] = (lotList[2],lotList[3],lot)
+        webLots.append(counts)
+    print(webLots)
+    WebserverTester.setLots(webLots)
 
 
 main()

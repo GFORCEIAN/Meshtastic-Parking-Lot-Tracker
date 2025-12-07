@@ -2,9 +2,23 @@
     "lotConfig": {
         "Lot North": [
             "74CC",
-            "!433b01c8"
-        ]
-    },
+            "!433b01c8",
+             0,
+            100
+            ],
+        "Lot South": [
+            "74CC",
+            "!433b01c8",
+             0,
+            100
+            ],
+        "Far Lot": [
+            "74CC",
+            "!433b01c8",
+             0,
+            100
+            ]
+        },
     "serverConfig": {},
     "webServerConfig": {}
 }

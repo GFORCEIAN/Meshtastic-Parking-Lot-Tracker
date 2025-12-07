@@ -24,7 +24,7 @@ def getNum() -> int:
         except ValueError as e:
             print("please provide an integer: ", end="")
         except KeyboardInterrupt:
-            print("traitor...")
+            print("something must've gone wrong, oops")
             raise KeyboardInterrupt("user aborted program")
     return num
 
@@ -58,7 +58,7 @@ def getLotConfig() -> dict:
         print("whats the lot name " + name + " monitors?")
         lot = input()
 
-        conf["lotConfig"].update({lot: (name, id)})
+        conf["lotConfig"].update({lot: (name, id,0)})#defaults to an initial count of zero
     return conf
 
 
