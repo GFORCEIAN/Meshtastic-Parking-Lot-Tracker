@@ -101,7 +101,7 @@ def interpret(s: str, fromId):
 
                 entered:bool  = False
 
-                if(msg[2].strip().lower() == "R"):#right is entered on non inverted
+                if(msg[2].strip().lower() == "r"):#right is entered on non inverted
                     entered = True
 
                 if(inverted):
@@ -163,7 +163,7 @@ def setLotCount(lotname:str, count: int):
     print("Set " + lotname + " to " + str(count) + " cars.")
 def getLotCount(lotname:str) -> int:
     lotList = custom_lots_dict.get(lotname)
-    return (lotList[2] - lotList[1])
+    return lotList[1]
 def enterLot(lot:str):
     setLotCount(lot,getLotCount(lot)+1)
 def leaveLot(lot:str):
@@ -172,7 +172,7 @@ def updateWebSite():
     webLots:list = []
     for lot in custom_lots:
         lotList = custom_lots_dict.get(lot)
-        counts:tuple[int,int,str] = (lotList[1],lotList[2],lot)
+        counts:tuple[int,int,str] = (lotList[2] - lotList[1],lotList[1],lot)
         webLots.append(counts)
     #print(webLots)
     WebserverTester.setLots(webLots)
@@ -184,7 +184,7 @@ def getLotName(id:str)-> tuple[str,bool]:
         for lot in custom_lots:
             for node in custom_lots_dict.get(lot)[0]:
                 nodeToLot[node[0]]=(lot, node[1])
-    print(nodeToLot.get(id) + str(nodeToLot.get(id)[1]))
+    print(str(nodeToLot.get(id)) + str(nodeToLot.get(id)[1]))
     return nodeToLot.get(id)[0],nodeToLot.get(id)[1]
 
 
