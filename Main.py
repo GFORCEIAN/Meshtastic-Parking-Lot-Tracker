@@ -94,8 +94,13 @@ def main():
                 c = text[0]#get command type
                 match c:
                     case "s":
+                        print("who do you want to send to? just press enter for channel 0.")
+                        where:str = input()
                         print("What woould you like to send? ")
-                        send_message(input())
+                        if not (where == ""):
+                            send_message(input(),where)
+                        else:
+                            send_message(input())
                     case "u":
 
                         try:
