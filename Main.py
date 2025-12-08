@@ -10,10 +10,24 @@ from csv_logger_test import ParkingLog
 import threading
 import platform
 
+import signal
+import sys
+
+
 def saveLotCounts():
     with open("config/config.json", "w") as w:
         #print(config)
         json.dump(config, w, indent=4)
+
+def sigterm_handler(signum, frame):
+    """
+    Signal handler for SIGTERM.
+    Performs cleanup operations and exits gracefully.
+    """
+    print(f"Received SIGTERM (signal {signum}). Performing graceful shutdown...")
+    saveLotCounts()
+    sys.exit(0)
+
 
 interface : meshtastic.serial_interface.SerialInterface
 nodeConnected:bool = True
@@ -97,7 +111,6 @@ def main():
                             print(w)
                     case _:
                         print("bad input")
-        saveLotCounts()
 
 
 
@@ -219,8 +232,11 @@ def getLotMax(lotname:str)-> int:
 #getLotName("!433b01c8")
 
 
+signal.signal(signal.SIGTERM, sigterm_handler)
 
 try:
     main()
+    sys.exit(0)
 except Exception:
     saveLotCounts()
+    sys.exit(1)
