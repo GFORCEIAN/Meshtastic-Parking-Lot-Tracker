@@ -103,15 +103,15 @@ def interpret(s: str, fromId):
     print("Message from ("+fromId+"): " + str(msg))
     match(msg[0]):
         case "L": #Update Lot Counts
-            if len(msg) < 3:
-                print("Invalid lot message format >:O. Expected: L,<lot_name>,<enter/leave>")
+            if len(msg) < 4:
+                print("Invalid lot message format >:O. Expected: L,<L/R>,<time>,<id>")
                 return
             lot_name, inverted = getLotName(fromId)
             if custom_lots.__contains__(lot_name):
 
                 entered:bool  = False
 
-                if(msg[2].strip().lower() == "r"):#right is entered on non inverted
+                if(msg[1].strip().lower() == "r"):#right is entered on non inverted
                     entered = True
 
                 if(inverted):
@@ -127,11 +127,13 @@ def interpret(s: str, fromId):
                 else:
                     leaveLot(lot_name)
                 updateWebSite()
+                send_message(f"LR,{msg[3]}",fromId)
 
 
 
-        case "B": #update Battery Monitoring CSV
-            print("got bat info")
+        case "P": #update Battery Monitoring CSV
+            print(f"Node {fromId} battery: {msg[1]}%")
+            send_message("PR", fromId)
             pass # do nothing for now
 
         case "W": #log warning condition
@@ -141,12 +143,18 @@ def interpret(s: str, fromId):
             id:int = int(msg[2])
 
             print(f"Warning ({id}): {warningMessage}")
-            send_message(f"WR,{id}")
+            send_message(f"WR,{id}", fromId)
             pass # do nothing for now
 
         case "❤️":
             # heart beat, relpy with beating heart
-            send_message("💓")
+            send_message("💓",fromId)
+            pass
+        case "B":
+            # boot message
+            # lot = logger.get_lot_status(getLotName(fromId))
+            # cap = lot.get("max")
+            send_message(f"BR,{100}", fromId)
             pass
         case _:
             pass
@@ -165,8 +173,8 @@ def onReceive(packet:dict, interface):
     except KeyError as e:
         print(f"Error processing packet: {e}")
 
-def send_message(message:str):
-    interface.sendText(message, channelIndex=2, destinationId="!433b01c8", wantResponse=True)
+def send_message(message:str, destinationId = meshtastic.BROADCAST_ADDR, channel = 0):
+    interface.sendText(message, channelIndex = channel, destinationId = destinationId, wantResponse=True)
 
 def setLotCount(lotname:str, count: int):
     custom_lots_dict.get(lotname)[1] = count
