@@ -53,15 +53,15 @@ def api():
         #return {"error": "Logger not initialized"}
     #status = logger.get_lot_status()
     return {
-        "ParkingLotA": {
+        "Lot North": {
             "Free": lotCounts[0][0],
             "Occupied": lotCounts[0][1]
         },
-        "ParkingLotB": {
+        "Lot South": {
             "Free": lotCounts[1][0],
             "Occupied": lotCounts[1][1]
         },
-        "ParkingLotC": {
+        "Lot Far": {
             "Free": lotCounts[2][0],
             "Occupied": lotCounts[2][1]
         },
