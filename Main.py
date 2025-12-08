@@ -10,6 +10,20 @@ from csv_logger_test import ParkingLog
 import threading
 import platform
 
+import signal
+class GracefulKiller:
+  kill_now = False
+  def __init__(self):
+    signal.signal(signal.SIGINT, self.exit_gracefully)
+    signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+  def exit_gracefully(self, signum, frame):
+    self.kill_now = True
+
+def saveLotCounts():
+    with open("config/config.json", "w") as w:
+        #print(config)
+        json.dump(config, w, indent=4)
 
 interface : meshtastic.serial_interface.SerialInterface
 nodeConnected:bool = True
@@ -62,7 +76,8 @@ def main():
 
         updateWebSite()
         # main loop
-        while True:
+        killer = GracefulKiller()
+        while not killer.kill_now:
             print("> ",end="")
             text:str = input()
             print(text)
@@ -92,7 +107,7 @@ def main():
                             print(w)
                     case _:
                         print("bad input")
-
+        saveLotCounts()
 
 
 
@@ -217,7 +232,5 @@ def getLotMax(lotname:str)-> int:
 
 try:
     main()
-finally:
-    with open("config/config.json", "w") as w:
-        #print(config)
-        json.dump(config, w, indent=4)
+except Exception:
+    saveLotCounts()
