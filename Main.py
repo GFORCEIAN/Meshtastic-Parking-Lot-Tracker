@@ -10,16 +10,6 @@ from csv_logger_test import ParkingLog
 import threading
 import platform
 
-import signal
-class GracefulKiller:
-  kill_now = False
-  def __init__(self):
-    signal.signal(signal.SIGINT, self.exit_gracefully)
-    signal.signal(signal.SIGTERM, self.exit_gracefully)
-
-  def exit_gracefully(self, signum, frame):
-    self.kill_now = True
-
 def saveLotCounts():
     with open("config/config.json", "w") as w:
         #print(config)
@@ -76,8 +66,8 @@ def main():
 
         updateWebSite()
         # main loop
-        killer = GracefulKiller()
-        while not killer.kill_now:
+
+        while True:
             print("> ",end="")
             text:str = input()
             print(text)
