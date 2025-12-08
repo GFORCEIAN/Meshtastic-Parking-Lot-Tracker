@@ -183,9 +183,12 @@ def getLotCount(lotname:str) -> int:
     lotList = custom_lots_dict.get(lotname)
     return lotList[1]
 def enterLot(lot:str):
-    setLotCount(lot,getLotCount(lot)+1)
+    if(getLotCount(lot)+1) < getLotMax(lot):
+        setLotCount(lot,getLotCount(lot)+1)
 def leaveLot(lot:str):
-    setLotCount(lot, getLotCount(lot) - 1)
+    if (getLotCount(lot) - 1) > 0:
+        setLotCount(lot, getLotCount(lot) - 1)
+
 def updateWebSite():
     webLots:list = []
     for lot in custom_lots:
@@ -204,7 +207,9 @@ def getLotName(id:str)-> tuple[str,bool]:
                 nodeToLot[node[0]]=(lot, node[1])
     print(str(nodeToLot.get(id)) + str(nodeToLot.get(id)[1]))
     return nodeToLot.get(id)[0],nodeToLot.get(id)[1]
-
+def getLotMax(lotname:str)-> int:
+    lotList = custom_lots_dict.get(lotname)
+    return lotList[2]
 
 #getLotName("!433b01c8")
 
